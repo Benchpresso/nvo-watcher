@@ -1,0 +1,14 @@
+{
+ "cik": "353278",
+ "name": "NOVO NORDISK A S",
+ "tickers": ["NVO"],
+ "filings": {
+  "recent": {
+   "form":               ["6-K",           "SD",             "20-F"],
+   "accessionNumber":    ["0001171843-26-004411", "0001171843-26-004000", "0001171843-26-000901"],
+   "filingDate":         ["2026-08-01",    "2026-07-20",     "2026-02-05"],
+   "primaryDocument":    ["f6k_080126.htm", "sd_072026.htm", "f20f_020526.htm"],
+   "primaryDocDescription": ["Company announcement", "Specialized disclosure", "Annual report"]
+  }
+ }
+}

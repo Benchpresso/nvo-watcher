@@ -1,0 +1,73 @@
+name: watch
+
+on:
+  schedule:
+    # 10분마다. GitHub의 예약 실행은 혼잡하면 몇 분 밀리거나 건너뛸 수 있다.
+    # 실제 체감은 보통 10~20분 간격이다.
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "실행 모드"
+        type: choice
+        options: [normal, dry-run, seed]
+        default: normal
+
+concurrency:
+  # 앞 실행이 끝나기 전에 다음 실행이 겹치면 상태 파일이 꼬인다.
+  group: watch
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # state/seen.json 되커밋용
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: 자체 점검
+        run: python watcher.py --test
+
+      - name: 수집 및 전송
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+          SUMMARY_MODEL: ${{ vars.SUMMARY_MODEL }}
+        run: |
+          case "${{ inputs.mode || 'normal' }}" in
+            dry-run) python watcher.py --dry-run ;;
+            seed)    python watcher.py --seed ;;
+            *)       python watcher.py ;;
+          esac
+
+      - name: 상태 저장
+        if: ${{ inputs.mode != 'dry-run' }}
+        run: |
+          if git diff --quiet -- state/seen.json; then
+            echo "변경 없음"
+            exit 0
+          fi
+          git config user.name  "nvo-watcher"
+          git config user.email "actions@users.noreply.github.com"
+          git add state/seen.json
+          git commit -m "state: 발송 기록 갱신 [skip ci]"
+          # 다른 실행이 먼저 푸시했을 수 있으니 리베이스 후 재시도
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && \
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep 5
+          done
+          echo "상태 푸시 실패 — 다음 실행에서 일부 항목이 중복 발송될 수 있음" >&2
+          exit 1

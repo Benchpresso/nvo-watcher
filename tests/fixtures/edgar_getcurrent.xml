@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+ <title>Latest Filings</title>
+ <entry>
+  <title>S-1 - OpenAI Group PBC (0002099999) (Filer)</title>
+  <link rel="alternate" type="text/html" href="https://www.sec.gov/Archives/edgar/data/2099999/000209999926000012/0002099999-26-000012-index.htm"/>
+  <updated>2026-08-03T09:41:22-04:00</updated>
+ </entry>
+ <entry>
+  <title>S-1 - Anthropic PBC (0002088888) (Filer)</title>
+  <link rel="alternate" type="text/html" href="https://www.sec.gov/Archives/edgar/data/2088888/000208888826000004/0002088888-26-000004-index.htm"/>
+  <updated>2026-08-03T08:12:05-04:00</updated>
+ </entry>
+ <entry>
+  <title>S-1 - Acme Widgets Inc (0001234567) (Filer)</title>
+  <link rel="alternate" type="text/html" href="https://www.sec.gov/Archives/edgar/data/1234567/000123456726000099/0001234567-26-000099-index.htm"/>
+  <updated>2026-08-03T07:00:00-04:00</updated>
+ </entry>
+</feed>
